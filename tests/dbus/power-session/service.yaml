@@ -1,0 +1,38 @@
+# dde-services: power session 插件的 DBus 接口测试(DSM 插件形态)。
+# 依赖:org.freedesktop.login1(登錄管理)、dconfig(org.deepin.dde.controlcenter)。
+# 离屏 CI 无 login1/UPower:代理调用失败走默认值分支,属性应可读。
+apiVersion: v1
+process: libplugin-power-session
+mode: isolate
+kind: dsm
+tier: T3
+
+services:
+  - org.deepin.dde.Power1
+
+plugin: ${BUILD_DIR}/lib/libplugin-power-session.so
+
+needs:
+  - mock: dconfig
+    bus: system
+
+sandbox:
+  home: tmp
+  env:
+    QT_QPA_PLATFORM: offscreen
+    LANG: C.UTF-8
+    LANGUAGE: en_US
+
+ready:
+  name-owner:
+    - org.deepin.dde.Power1
+  timeout: 20s
+
+ignore:
+  interfaces:
+    - "org.freedesktop.DBus.*"
+    # WarnLevelConfig 是会话内子接口(lowpowermanager),与主接口同对象但
+    # 生命周期由主管理;若 introspect 暴露再显式纳入基线
+    - "org.deepin.dde.Power1.WarnLevelConfig"
+
+teardown: kill

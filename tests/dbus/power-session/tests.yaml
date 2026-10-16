@@ -1,0 +1,38 @@
+# power session 插件用例。离屏 CI 无 login1/UPower/传感器:
+# - 硬件相关属性(LidIsPresent/HasAmbientLightSensor 等)走"查不到→false"分支,
+#   这些 false 是插件定义的降级契约,可直接断言
+# - dconfig 驱动的配置属性由 mock 提供默认值,只断言可读与签名
+apiVersion: v1
+cases:
+  # —— 降级契约:无硬件环境恒定值 ——
+  - name: lid-not-present-without-upower
+    get-prop: { property: LidIsPresent }
+    expect: { value: false }
+
+  - name: no-ambient-light-sensor
+    get-prop: { property: HasAmbientLightSensor }
+    expect: { value: false }
+
+  - name: battery-not-present
+    get-prop: { property: BatteryIsPresent }
+    expect: { signature: "a{sb}" }
+
+  # —— 配置属性可读(dconfig mock 默认值)——
+  - name: line-power-lock-delay-readable
+    get-prop: { property: LinePowerLockDelay }
+    expect: { signature: "i" }
+
+  - name: battery-screen-black-delay-readable
+    get-prop: { property: BatteryScreenBlackDelay }
+    expect: { signature: "i" }
+
+  - name: line-power-sleep-delay-readable
+    get-prop: { property: LinePowerSleepDelay }
+    expect: { signature: "i" }
+
+  # —— 配置写读:数值类型 i 的 set 走 dconfig mock 的 setValue(空实现,幂等)——
+  - name: set-battery-screensaver-delay-callable
+    set-prop: { property: BatteryScreensaverDelay, value: 300 }
+
+  - name: contract
+    check-contract: {}

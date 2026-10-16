@@ -1,0 +1,47 @@
+<node>
+  <object path="/org/deepin/dde/XSettings1">
+    <interface name="org.deepin.dde.XSettings1">
+      <method name="GetColor">
+        <arg type="aq" direction="out"/>
+        <arg name="prop" type="s" direction="in"/>
+      </method>
+      <method name="GetInteger">
+        <arg type="i" direction="out"/>
+        <arg name="prop" type="s" direction="in"/>
+      </method>
+      <method name="GetScaleFactor">
+        <arg type="d" direction="out"/>
+      </method>
+      <method name="GetScreenScaleFactors">
+        <arg type="a{sd}" direction="out"/>
+      </method>
+      <method name="GetString">
+        <arg type="s" direction="out"/>
+        <arg name="prop" type="s" direction="in"/>
+      </method>
+      <method name="ListProps">
+        <arg type="s" direction="out"/>
+      </method>
+      <method name="SetColor">
+        <arg name="prop" type="s" direction="in"/>
+        <arg name="v" type="aq" direction="in"/>
+      </method>
+      <method name="SetInteger">
+        <arg name="prop" type="s" direction="in"/>
+        <arg name="v" type="i" direction="in"/>
+      </method>
+      <method name="SetScaleFactor">
+        <arg name="scale" type="d" direction="in"/>
+      </method>
+      <method name="SetScreenScaleFactors">
+        <arg name="factors" type="a{sd}" direction="in"/>
+      </method>
+      <method name="SetString">
+        <arg name="prop" type="s" direction="in"/>
+        <arg name="v" type="s" direction="in"/>
+      </method>
+      <signal name="SetScaleFactorDone"/>
+      <signal name="SetScaleFactorStarted"/>
+    </interface>
+  </object>
+</node>

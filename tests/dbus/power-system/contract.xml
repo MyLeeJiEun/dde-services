@@ -1,0 +1,99 @@
+<node>
+  <object path="/org/deepin/dde/Power1">
+    <interface name="org.deepin.dde.Power1">
+      <method name="GetBatteries">
+        <arg type="ao" direction="out"/>
+      </method>
+      <method name="LockCpuFreq">
+        <arg name="gov" type="s" direction="in"/>
+        <arg name="lockTime" type="i" direction="in"/>
+      </method>
+      <method name="Refresh"/>
+      <method name="RefreshBatteries"/>
+      <method name="RefreshMains"/>
+      <method name="SetAllowCaller">
+        <arg name="uniqueName" type="s" direction="in"/>
+      </method>
+      <method name="SetCpuBoost">
+        <arg name="on" type="b" direction="in"/>
+      </method>
+      <method name="SetCpuGovernor">
+        <arg name="gov" type="s" direction="in"/>
+      </method>
+      <method name="SetIdleState">
+        <arg name="state" type="b" direction="in"/>
+      </method>
+      <method name="SetMode">
+        <arg name="mode" type="s" direction="in"/>
+      </method>
+      <method name="SetScreenState">
+        <arg name="state" type="b" direction="in"/>
+      </method>
+      <method name="SetShortIdleState">
+        <arg name="state" type="b" direction="in"/>
+      </method>
+      <method name="SetTlpMode">
+        <arg name="mode" type="s" direction="in"/>
+      </method>
+      <signal name="BatteryAdded">
+        <arg name="path" type="o"/>
+      </signal>
+      <signal name="BatteryDisplayUpdate">
+        <arg name="timestamp" type="x"/>
+      </signal>
+      <signal name="BatteryRemoved">
+        <arg name="path" type="o"/>
+      </signal>
+      <signal name="LidClosed"/>
+      <signal name="LidOpened"/>
+      <signal name="batteryCapacityChanged"/>
+      <signal name="batteryPercentageChanged"/>
+      <signal name="batteryStatusChanged"/>
+      <signal name="batteryTimeToEmptyChanged"/>
+      <signal name="batteryTimeToFullChanged"/>
+      <signal name="cpuBoostChanged"/>
+      <signal name="cpuGovernorChanged"/>
+      <signal name="hasBatteryChanged"/>
+      <signal name="hasLidSwitchChanged"/>
+      <signal name="isBalanceSupportedChanged"/>
+      <signal name="isHighPerformanceSupportedChanged"/>
+      <signal name="isPowerSaveSupportedChanged"/>
+      <signal name="lidClosedChanged"/>
+      <signal name="modeChanged"/>
+      <signal name="onBatteryChanged"/>
+      <signal name="powerSavingModeAutoBatteryPercentChanged"/>
+      <signal name="powerSavingModeAutoChanged"/>
+      <signal name="powerSavingModeAutoWhenBatteryLowChanged"/>
+      <signal name="powerSavingModeBrightnessDataChanged"/>
+      <signal name="powerSavingModeBrightnessDropPercentChanged"/>
+      <signal name="powerSavingModeEnabledChanged"/>
+      <signal name="shortIdleStateChanged"/>
+      <signal name="supportSwitchPowerModeChanged"/>
+      <signal name="tlpModeChanged"/>
+      <property name="BatteryCapacity" type="d" access="read"/>
+      <property name="BatteryPercentage" type="d" access="read"/>
+      <property name="BatteryStatus" type="u" access="read"/>
+      <property name="BatteryTimeToEmpty" type="t" access="read"/>
+      <property name="BatteryTimeToFull" type="t" access="read"/>
+      <property name="CpuBoost" type="b" access="read"/>
+      <property name="CpuGovernor" type="s" access="read"/>
+      <property name="HasBattery" type="b" access="read"/>
+      <property name="HasLidSwitch" type="b" access="read"/>
+      <property name="IsBalanceSupported" type="b" access="read"/>
+      <property name="IsHighPerformanceSupported" type="b" access="read"/>
+      <property name="IsPowerSaveSupported" type="b" access="read"/>
+      <property name="LidClosed" type="b" access="read"/>
+      <property name="Mode" type="s" access="read"/>
+      <property name="OnBattery" type="b" access="read"/>
+      <property name="PowerSavingModeAuto" type="b" access="readwrite"/>
+      <property name="PowerSavingModeAutoBatteryPercent" type="u" access="readwrite"/>
+      <property name="PowerSavingModeAutoWhenBatteryLow" type="b" access="readwrite"/>
+      <property name="PowerSavingModeBrightnessData" type="s" access="readwrite"/>
+      <property name="PowerSavingModeBrightnessDropPercent" type="u" access="readwrite"/>
+      <property name="PowerSavingModeEnabled" type="b" access="readwrite"/>
+      <property name="ShortIdleState" type="b" access="read"/>
+      <property name="SupportSwitchPowerMode" type="b" access="readwrite"/>
+      <property name="TlpMode" type="s" access="read"/>
+    </interface>
+  </object>
+</node>

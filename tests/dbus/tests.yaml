@@ -1,0 +1,58 @@
+# dde-services xsettings 插件的 DBus 接口用例。
+# 无 X 环境下 xcb_connect 失败,XSettingsManager 走默认值分支:
+# - ListProps 返回空 JSON
+# - Get* 返回默认值(未知 prop 空串/0)
+# - Set* 写 X property 静默失败(changeSettingProp 里 getAtom 失败直接
+#   return false),因此 roundtrip 断言在此环境不成立;Set 用例只验证
+#   可调用不抛错。信号同理由 xcb 写路径触发,离屏下不发。
+apiVersion: v1
+cases:
+  - name: list-props-callable
+    call: { method: ListProps }
+
+  - name: get-string-unknown-prop
+    call:
+      method: GetString
+      args: ["__no_such_prop__"]
+    expect: { value: "" }
+
+  - name: get-integer-unknown-prop
+    call:
+      method: GetInteger
+      args: ["__no_such_prop__"]
+    expect: { value: 0 }
+
+  - name: get-color-unknown-prop
+    call: { method: GetColor, args: ["__no_such_prop__"] }
+    expect: { signature: "aq" }
+
+  - name: get-scale-factor-callable
+    call: { method: GetScaleFactor }
+    expect: { signature: "d" }
+
+  - name: get-screen-scale-factors-callable
+    call: { method: GetScreenScaleFactors }
+    expect: { signature: "a{sd}" }
+
+  - name: set-string-callable
+    call: { method: SetString, args: ["font-size", "11"] }
+
+  - name: set-integer-callable
+    call: { method: SetInteger, args: ["cursor-size", 24] }
+
+  - name: set-color-callable
+    # ArrayOfColor = QList<quint16>,入参签名 aq;框架默认把整型列表编为 ai,
+    # 需显式指定签名(call.signature,框架 409896c 后支持)
+    call:
+      method: SetColor
+      args: ["__no_such_prop__", [65535, 0, 0]]
+      signature: "saq"
+
+  - name: set-screen-scale-factors-callable
+    call: { method: SetScreenScaleFactors, args: [{ ALL: 1.25 }] }
+
+  - name: set-scale-factor-callable
+    call: { method: SetScaleFactor, args: [1.25] }
+
+  - name: contract
+    check-contract: {}

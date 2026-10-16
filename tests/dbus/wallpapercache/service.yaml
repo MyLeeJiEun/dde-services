@@ -1,0 +1,34 @@
+# dde-services: wallpapercache 插件的 DBus 接口测试(DSM 插件形态)。
+# 双接口:WallpaperCache(主)与 ImageEffect1(兼容层),对象路径各异。
+apiVersion: v1
+process: libplugin-qt-wallpapercache
+mode: isolate
+kind: dsm
+tier: T3
+
+services:
+  - org.deepin.dde.WallpaperCache
+
+plugin: ${BUILD_DIR}/lib/libplugin-qt-wallpapercache.so
+
+needs:
+  - mock: dconfig
+    bus: system
+
+sandbox:
+  home: tmp
+  env:
+    QT_QPA_PLATFORM: offscreen
+    LANG: C.UTF-8
+    LANGUAGE: en_US
+
+ready:
+  name-owner:
+    - org.deepin.dde.WallpaperCache
+  timeout: 20s
+
+ignore:
+  interfaces:
+    - "org.freedesktop.DBus.*"
+
+teardown: kill

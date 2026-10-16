@@ -1,0 +1,37 @@
+# power system 插件用例。离屏 CI 无 UPower/login1/物理电池:
+# - HasBattery/HasLidSwitch 走"查不到→false"降级分支,可直接断言
+# - Battery* 属性无数据源时返回默认值(d 0.0 / u 0),断言签名即可
+# - CpuGovernor 等读 sysfs 的属性,容器内也存在(写靠 dconfig mock)
+apiVersion: v1
+cases:
+  - name: has-battery-readable
+    # HasBattery 初值 true,UPower 缺失不会翻转它(仅由 BatteryManager 实测驱动),
+    # 所以这里断言签名而非具体值
+    get-prop: { property: HasBattery }
+    expect: { signature: "b" }
+
+  - name: no-lid-switch
+    get-prop: { property: HasLidSwitch }
+    expect: { value: false }
+
+  - name: battery-percentage-signature
+    get-prop: { property: BatteryPercentage }
+    expect: { signature: "d" }
+
+  - name: cpu-governor-readable
+    get-prop: { property: CpuGovernor }
+    expect: { signature: "s" }
+
+  - name: cpu-boost-readable
+    get-prop: { property: CpuBoost }
+    expect: { signature: "b" }
+
+  - name: set-mode-callable
+    # SetMode 走 PolicyKit 门禁;框架 polkitd 模板默认放行(CheckAuthorization
+    # 直接返回 authorized=true)。m_mode 初值随配置,传非默认模式避开
+    # 插件自己的 "repeat set mode" 防抖错误
+    steps:
+      - call: { method: SetMode, args: ["performance"] }
+
+  - name: contract
+    check-contract: {}

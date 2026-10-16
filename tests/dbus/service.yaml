@@ -1,0 +1,30 @@
+# dde-services: xsettings 插件的 DBus 接口测试(DSM 插件形态)。
+# 插件经 dsm-host 加载,注册 org.deepin.dde.XSettings1。
+apiVersion: v1
+process: libplugin-dde-xsettings
+mode: isolate
+kind: dsm
+tier: T3
+
+services:
+  - org.deepin.dde.XSettings1
+
+plugin: ${BUILD_DIR}/lib/libplugin-dde-xsettings.so
+
+sandbox:
+  home: tmp
+  env:
+    QT_QPA_PLATFORM: offscreen
+    LANG: C.UTF-8
+    LANGUAGE: en_US
+
+ready:
+  name-owner:
+    - org.deepin.dde.XSettings1
+  timeout: 20s
+
+ignore:
+  interfaces:
+    - "org.freedesktop.DBus.*"
+
+teardown: kill

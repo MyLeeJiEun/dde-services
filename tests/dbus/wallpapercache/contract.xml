@@ -1,0 +1,83 @@
+<node>
+  <object path="/org/deepin/dde/ImageBlur1">
+    <interface name="org.deepin.dde.ImageBlur1">
+      <method name="Delete">
+        <arg name="filename" type="s" direction="in"/>
+      </method>
+      <method name="Get">
+        <arg type="s" direction="out"/>
+        <arg name="filename" type="s" direction="in"/>
+      </method>
+      <signal name="BlurDone">
+        <arg name="file" type="s"/>
+        <arg name="blurFile" type="s"/>
+        <arg name="ok" type="b"/>
+      </signal>
+    </interface>
+  </object>
+  <object path="/org/deepin/dde/ImageEffect1">
+    <interface name="org.deepin.dde.ImageEffect1">
+      <method name="Delete">
+        <arg name="effect" type="s" direction="in"/>
+        <arg name="filename" type="s" direction="in"/>
+      </method>
+      <method name="Get">
+        <arg type="s" direction="out"/>
+        <arg name="effect" type="s" direction="in"/>
+        <arg name="filename" type="s" direction="in"/>
+      </method>
+    </interface>
+  </object>
+  <object path="/org/deepin/dde/WallpaperCache">
+    <interface name="org.deepin.dde.WallpaperCache">
+      <method name="Delete">
+        <arg name="effect" type="s" direction="in"/>
+        <arg name="filename" type="s" direction="in"/>
+      </method>
+      <method name="Get">
+        <arg type="s" direction="out"/>
+        <arg name="effect" type="s" direction="in"/>
+        <arg name="filename" type="s" direction="in"/>
+      </method>
+      <method name="GetBlurImagePath">
+        <arg type="s" direction="out"/>
+        <arg name="originalPath" type="s" direction="in"/>
+      </method>
+      <method name="GetProcessedImagePathByFd">
+        <arg type="as" direction="out"/>
+        <arg name="fd" type="h" direction="in"/>
+        <arg name="imagePathMd5" type="s" direction="in"/>
+        <arg name="sizeArray" type="av" direction="in"/>
+      </method>
+      <method name="GetProcessedImagePathByFdWithBlur">
+        <arg type="as" direction="out"/>
+        <arg name="fd" type="h" direction="in"/>
+        <arg name="imagePathMd5" type="s" direction="in"/>
+        <arg name="sizeArray" type="av" direction="in"/>
+        <arg name="needBlur" type="b" direction="in"/>
+      </method>
+      <method name="GetProcessedImagePaths">
+        <arg type="as" direction="out"/>
+        <arg name="originalPath" type="s" direction="in"/>
+        <arg name="sizeArray" type="av" direction="in"/>
+      </method>
+      <method name="GetProcessedImageWithBlur">
+        <arg type="as" direction="out"/>
+        <arg name="originalPath" type="s" direction="in"/>
+        <arg name="sizeArray" type="av" direction="in"/>
+        <arg name="needBlur" type="b" direction="in"/>
+      </method>
+      <method name="GetWallpaperListForScreen">
+        <arg type="as" direction="out"/>
+        <arg name="originalPath" type="s" direction="in"/>
+        <arg name="sizeArray" type="av" direction="in"/>
+        <arg name="needBlur" type="b" direction="in"/>
+      </method>
+      <method name="GetWallpaperListForScreen">
+        <arg type="as" direction="out"/>
+        <arg name="originalPath" type="s" direction="in"/>
+        <arg name="sizeArray" type="av" direction="in"/>
+      </method>
+    </interface>
+  </object>
+</node>

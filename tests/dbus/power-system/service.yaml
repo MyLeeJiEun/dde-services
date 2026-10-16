@@ -1,0 +1,44 @@
+# dde-services: power system 插件的 DBus 接口测试(DSM 插件形态)。
+# 与 power session 同名服务 org.deepin.dde.Power1——真实环境分属
+# system/session 总线;测试中 system 插件跑在私有 system 总线,
+# 与 session 套件互不冲突。
+# 依赖:dconfig、UPower(org.freedesktop.UPower)、login1。离屏 CI 无硬件:
+# 电池/盖子属性走"查不到→空/false"降级分支。
+apiVersion: v1
+process: libplugin-power-system
+mode: isolate
+kind: dsm
+tier: T3
+
+services:
+  - org.deepin.dde.Power1
+
+plugin: ${BUILD_DIR}/lib/libplugin-power-system.so
+
+needs:
+  - mock: dconfig
+    bus: system
+  # SetMode 走 PolicyKit 门禁;dbusmock 内置 polkitd 模板默认放行
+  - mock: polkitd
+    bus: system
+
+sandbox:
+  home: tmp
+  env:
+    QT_QPA_PLATFORM: offscreen
+    LANG: C.UTF-8
+    LANGUAGE: en_US
+
+ready:
+  name-owner:
+    - org.deepin.dde.Power1
+  timeout: 20s
+
+ignore:
+  interfaces:
+    - "org.freedesktop.DBus.*"
+    # Battery 子对象(/org/deepin/dde/Power1/Batteries/N)运行时动态注册,
+    # 无电池环境不出现;主接口基线不包含它
+    - "org.deepin.dde.Power1.Battery"
+
+teardown: kill

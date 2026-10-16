@@ -1,0 +1,18 @@
+# ambient-brightness 用例。无传感器环境 Supported=false、State=Unavailable
+# 是插件自身定义的降级契约(supportedChanged 信号不发,值稳定)。
+apiVersion: v1
+cases:
+  - name: supported-false-without-sensor
+    get-prop: { property: Supported }
+    expect: { value: false }
+
+  - name: state-readable
+    get-prop: { property: State }
+    expect: { signature: "s" }
+
+  - name: enabled-readable
+    get-prop: { property: Enabled }
+    expect: { signature: "b" }
+
+  - name: contract
+    check-contract: {}

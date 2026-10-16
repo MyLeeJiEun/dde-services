@@ -1,0 +1,101 @@
+name: DBus interface test
+
+# dde-services 的 DBus 接口测试:对本仓各 DSM 插件经 hosts/dsm-host
+# 加载后逐个验证接口面。配置在 tests/dbus/<插件>/(service.yaml /
+# contract.xml / tests.yaml),matrix 逐插件跑。
+#
+# 容器用 Deepin 官方镜像 linuxdeepin/deepin:crimson(deps 与上游构建环境对齐)。
+# X 依赖:xsettings 初始化要 xcb_connect,离屏(offscreen)下连接失败走
+# 默认值分支(用例按此设计,见 tests/dbus/tests.yaml 头注释)。
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  dbus-interface:
+    runs-on: ubuntu-latest
+    container: linuxdeepin/deepin:crimson
+    strategy:
+      fail-fast: false
+      matrix:
+        plugin: [xsettings, wallpaperslideshow, ambient-brightness, wallpapercache, power-session, power-system]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装构建依赖(照抄 debian/control Build-Depends + 测试运行时)
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates git make cmake pkg-config build-essential g++ \
+            qt6-base-dev qt6-tools-dev qt6-tools-dev-tools \
+            qt6-wayland-dev qt6-wayland-private-dev qt6-wayland-dev-tools \
+            libsystemd-dev libudev-dev libpcap-dev libnet-dev libglib2.0-dev \
+            libdtk6gui-dev libdtk6core-dev libpolkit-qt6-1-dev \
+            libx11-dev libxcb1-dev libxcb-randr0-dev libxcb-xinput-dev \
+            libx11-xcb-dev libxcb-keysyms1-dev libxcb-xtest0-dev libxtst-dev libxss-dev \
+            wlr-protocols wayland-protocols treeland-protocols \
+            python3-pip python3-setuptools python3-wheel python3-yaml \
+            python3-dbus python3-gi python3-dbusmock \
+            adwaita-icon-theme deepin-desktop-schemas deepin-wallpapers \
+            gdb
+
+      - name: 构建被测插件
+        run: |
+          cmake -S . -B build-ds -DCMAKE_BUILD_TYPE=Release
+          cmake --build build-ds -j"$(nproc)"
+          # matrix 各插件共库目录,全量构建一次,按插件断言自己的产物。
+          # 产物名无统一规律(xsettings 是 libplugin-dde-xsettings,
+          # wallpapercache/thememanager 带 qt-,ambient-brightness 无前缀),
+          # 直接映射。
+          case "${{ matrix.plugin }}" in
+            xsettings)          SO=libplugin-dde-xsettings.so ;;
+            ambient-brightness) SO=libplugin-ambient-brightness.so ;;
+            wallpaperslideshow) SO=libplugin-qt-wallpaperslideshow.so ;;
+            wallpapercache)     SO=libplugin-qt-wallpapercache.so ;;
+            power-session)      SO=libplugin-power-session.so ;;
+            power-system)       SO=libplugin-power-system.so ;;
+            *) echo "未知插件 ${{ matrix.plugin }}"; exit 1 ;;
+          esac
+          test -f "build-ds/lib/$SO"
+
+      - name: 安装 dbus-testing
+        # dbus-testing 尚未发布到 PyPI,从源码仓库克隆后安装。
+        # --no-deps:运行时依赖已由 apt 装好,避免 pip 再去 PyPI 取。
+        env:
+          DBUS_TESTING_REPO: https://github.com/MyLeeJiEun/deepin-dbus-testing
+        run: |
+          git clone --depth 1 "${DBUS_TESTING_REPO}" /tmp/dbus-testing-src
+          pip install --break-system-packages --no-build-isolation --no-deps \
+            /tmp/dbus-testing-src
+          dbus-testing --version
+          # kind=dsm 需要宿主替身 dsm-host(可选组件,pyproject 不含它):
+          # 从 hosts/dsm-host 编译并装到 PATH —— 框架的 DSM_HOST_CANDIDATES
+          # 首选就是 PATH 里的 dbus-testing-dsm-host。
+          # cmake/g++/qt6-base-dev 已在上一步装好,这里不再重复安装。
+          cmake -S /tmp/dbus-testing-src/hosts/dsm-host \
+                -B /tmp/dsm-host-build -DCMAKE_BUILD_TYPE=Release
+          cmake --build /tmp/dsm-host-build -j"$(nproc)"
+          install -m755 /tmp/dsm-host-build/dbus-testing-dsm-host \
+                /usr/local/bin/dbus-testing-dsm-host
+          dbus-testing-dsm-host --version
+
+      - name: DBus 接口测试
+        run: |
+          # xsettings 配置在 tests/dbus/ 根(首批接入),其余在 tests/dbus/<插件>/
+          if [ -f "tests/dbus/${{ matrix.plugin }}/service.yaml" ]; then
+            SUITE="tests/dbus/${{ matrix.plugin }}"
+          else
+            SUITE="tests/dbus"
+          fi
+          dbus-testing run "$SUITE" --build-dir build-ds --report "artifacts/${{ matrix.plugin }}"
+
+      - name: 上传报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbus-test-report-${{ matrix.plugin }}
+          path: artifacts/
+          if-no-files-found: warn

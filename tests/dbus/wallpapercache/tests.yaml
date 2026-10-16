@@ -1,0 +1,43 @@
+# wallpapercache 插件用例(三对象:WallpaperCache/ImageEffect1/ImageBlur1)。
+# 缓存查询走文件系统(不存在的原图返回空列表/空串),Delete 幂等。
+apiVersion: v1
+cases:
+  - name: get-blur-image-path-nonexistent
+    call:
+      method: GetBlurImagePath
+      args: ["/__no_such__/img.jpg"]
+    expect: { signature: "s" }
+
+  - name: get-processed-paths-nonexistent
+    # QVariantList 参数签名是 av:dbus-python 无法从空 list 猜签名,显式指定 "sav"
+    call:
+      method: GetProcessedImagePaths
+      args: ["/__no_such__/img.jpg", []]
+      signature: "sav"
+    expect: { signature: "as" }
+
+  - name: imageeffect-get-nonexistent
+    call:
+      service: org.deepin.dde.WallpaperCache
+      object: /org/deepin/dde/ImageEffect1
+      interface: org.deepin.dde.ImageEffect1
+      method: Get
+      args: ["blur", "/__no_such__/img.jpg"]
+    expect: { signature: "s" }
+
+  - name: imageblur-get-nonexistent
+    call:
+      service: org.deepin.dde.WallpaperCache
+      object: /org/deepin/dde/ImageBlur1
+      interface: org.deepin.dde.ImageBlur1
+      method: Get
+      args: ["/__no_such__/img.jpg"]
+    expect: { signature: "s" }
+
+  - name: wallpapercache-delete-idempotent
+    call:
+      method: Delete
+      args: ["blur", "/__no_such__/img.jpg"]
+
+  - name: contract
+    check-contract: {}

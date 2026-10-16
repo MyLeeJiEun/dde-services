@@ -1,0 +1,35 @@
+# dde-services: ambient-brightness 插件的 DBus 接口测试(DSM 插件形态)。
+# 光感亮度依赖 net.hadess.SensorProxy(iio-sensor-proxy);离屏 CI 无硬件,
+# 传感器查找失败走"不支持"分支 —— Supported=false 是稳定契约。
+apiVersion: v1
+process: libplugin-ambient-brightness
+mode: isolate
+kind: dsm
+tier: T3
+
+services:
+  - org.deepin.dde.AmbientBrightness1
+
+plugin: ${BUILD_DIR}/lib/libplugin-ambient-brightness.so
+
+needs:
+  - mock: dconfig
+    bus: system
+
+sandbox:
+  home: tmp
+  env:
+    QT_QPA_PLATFORM: offscreen
+    LANG: C.UTF-8
+    LANGUAGE: en_US
+
+ready:
+  name-owner:
+    - org.deepin.dde.AmbientBrightness1
+  timeout: 20s
+
+ignore:
+  interfaces:
+    - "org.freedesktop.DBus.*"
+
+teardown: kill

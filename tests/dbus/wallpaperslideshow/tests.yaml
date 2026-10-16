@@ -1,0 +1,20 @@
+# wallpaperslideshow 插件的 DBus 接口用例。
+# 离屏环境:xcb_connect 失败,isValidScreen 恒 false —— Set 走 monitor
+# 不存在的拒绝分支,Get 返回 dconfig 默认值(mock 下为空串)。
+apiVersion: v1
+cases:
+  - name: get-slideshow-unknown-monitor
+    call:
+      method: GetWallpaperSlideShow
+      args: ["__no_such_monitor__"]
+    expect: { signature: "s" }
+
+  - name: set-slideshow-unknown-monitor-callable
+    call: { method: SetWallpaperSlideShow, args: ["__no_such_monitor__", "slideshow"] }
+
+  - name: prop-wallpaper-slideshow-readable
+    get-prop: { property: WallpaperSlideShow }
+    expect: { signature: "s" }
+
+  - name: contract
+    check-contract: {}

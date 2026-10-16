@@ -1,0 +1,15 @@
+<node>
+  <object path="/org/deepin/dde/WallpaperSlideshow">
+    <interface name="org.deepin.dde.WallpaperSlideshow">
+      <method name="GetWallpaperSlideShow">
+        <arg name="monitorName" type="s" direction="in"/>
+        <arg name="slideShow" type="s" direction="out"/>
+      </method>
+      <method name="SetWallpaperSlideShow">
+        <arg name="monitorName" type="s" direction="in"/>
+        <arg name="slideShow" type="s" direction="in"/>
+      </method>
+      <property name="WallpaperSlideShow" type="s" access="readwrite"/>
+    </interface>
+  </object>
+</node>

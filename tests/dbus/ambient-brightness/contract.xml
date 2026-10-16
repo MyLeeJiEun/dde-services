@@ -1,0 +1,25 @@
+<node>
+  <object path="/org/deepin/dde/AmbientBrightness1">
+    <interface name="org.deepin.dde.AmbientBrightness1">
+      <method name="Enable">
+        <arg name="active" type="b" direction="in"/>
+      </method>
+      <signal name="enabledChanged">
+        <arg name="value" type="b"/>
+      </signal>
+      <signal name="recommendedBrightnessChanged">
+        <arg name="value" type="d"/>
+      </signal>
+      <signal name="stateChanged">
+        <arg name="value" type="s"/>
+      </signal>
+      <signal name="supportedChanged">
+        <arg name="value" type="b"/>
+      </signal>
+      <property name="Enabled" type="b" access="read"/>
+      <property name="RecommendedBrightness" type="d" access="read"/>
+      <property name="State" type="s" access="read"/>
+      <property name="Supported" type="b" access="read"/>
+    </interface>
+  </object>
+</node>

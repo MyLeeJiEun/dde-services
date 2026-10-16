@@ -1,0 +1,40 @@
+# dde-services: wallpaperslideshow 插件的 DBus 接口测试(DSM 插件形态)。
+# 注册名 org.deepin.dde.WallpaperSlideshow(plugin.cpp 的
+# WALLPAPER_SLIDESHOW_SERVICE;plugin json 里的 org.deepin.service.
+# wallpaperslideshow 是 service-manager 分组名,不注册到总线)。
+apiVersion: v1
+process: libplugin-qt-wallpaperslideshow
+mode: isolate
+kind: dsm
+tier: T3
+
+services:
+  - org.deepin.dde.WallpaperSlideshow
+
+plugin: ${BUILD_DIR}/lib/libplugin-qt-wallpaperslideshow.so
+
+needs:
+  # DConfig::create(org.deepin.dde.appearance) 在构造期调用
+  - mock: dconfig
+    bus: system
+
+sandbox:
+  home: tmp
+  env:
+    QT_QPA_PLATFORM: offscreen
+    LANG: C.UTF-8
+    LANGUAGE: en_US
+
+ready:
+  name-owner:
+    - org.deepin.dde.WallpaperSlideshow
+  timeout: 20s
+
+ignore:
+  interfaces:
+    - "org.freedesktop.DBus.*"
+    # AppearanceDBusProxy 消费 Daemon1/Appearance1/com.deepin.wm(DDBusInterface
+    # 惰性调用,不注册即用默认值),非本插件导出契约
+    - "com.deepin.wm"
+
+teardown: kill
